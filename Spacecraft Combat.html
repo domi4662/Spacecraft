@@ -1,0 +1,390 @@
+<!doctype HTML>
+<html>
+<head>
+<title>Spacecraft Combat</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <link rel="icon" href="ico.ico">
+</head>
+    <script>
+        $(document).ready(function () {});
+
+        function mostrarJogo() {
+            iniciarMundo();
+            $("#wrapper").show();
+            $("#telaInicial").hide();
+        }
+
+        function mostrarTelaInicial() {
+            $("#wrapper").hide();
+            $("#telaInicial").show();
+        }
+
+
+        function maisVel1() {
+            if (document.getElementById("contPont1").innerHTML <= 0)
+                return;
+            document.getElementById("contPont1").innerHTML--;
+            var aux = document.getElementById("velM1").innerHTML;
+            document.getElementById("velM1").innerHTML=(aux < 10|| aux == "")?10:parseInt(aux) + 10;
+        }
+        function menosVel1() {
+            var aux = document.getElementById("velM1").innerHTML;
+            document.getElementById("velM1").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
+            if(aux>10)
+                document.getElementById("contPont1").innerHTML++;
+        }
+        function maisAce1() {
+            if (document.getElementById("contPont1").innerHTML <= 0)
+                return;
+            document.getElementById("contPont1").innerHTML--;
+            var aux = document.getElementById("acel1").innerHTML;
+            var aux = document.getElementById("acel1").innerHTML;
+            document.getElementById("acel1").innerHTML = (aux < 5 || aux == "") ? 5 : parseInt(aux) + 3;
+        }
+        function menosAce1() {
+            var aux = document.getElementById("acel1").innerHTML;
+            document.getElementById("acel1").innerHTML = (aux <= 5 || aux == "") ? 5 : parseInt(aux) - 3;
+            if (aux > 5)
+                document.getElementById("contPont1").innerHTML++;
+        }
+        function maisContr1() {
+            if (document.getElementById("contPont1").innerHTML <= 0)
+                return;
+            document.getElementById("contPont1").innerHTML--;
+            var aux = document.getElementById("contr1").innerHTML;
+                var aux = document.getElementById("contr1").innerHTML;
+                document.getElementById("contr1").innerHTML=(aux < 3|| aux == "")?3:parseInt(aux)+1;
+       }
+        function menosContr1()  {
+                var aux = document.getElementById("contr1").innerHTML;
+                document.getElementById("contr1").innerHTML = (aux <= 3 || aux == "") ? 3 : parseInt(aux) - 1;
+                if (aux > 3)
+                    document.getElementById("contPont1").innerHTML++;
+            }
+        function maisMuni1() {
+                if (document.getElementById("contPont1").innerHTML <= 1)
+                    return;
+                document.getElementById("contPont1").innerHTML-=2;
+                var aux = document.getElementById("muni1").innerHTML;
+                var aux = document.getElementById("muni1").innerHTML;
+                document.getElementById("muni1").innerHTML = (aux < 1 || aux == "") ? 1 : parseInt(aux) + 1;
+            }
+        function menosMuni1() {
+                var aux = document.getElementById("muni1").innerHTML;
+                document.getElementById("muni1").innerHTML = (aux <= 1 || aux == "") ? 1 : parseInt(aux) - 1;
+                if (aux != 1) {
+                    document.getElementById("contPont1").innerHTML++;
+                    document.getElementById("contPont1").innerHTML++;
+                }
+            }
+        function maisResist1() {
+                if (document.getElementById("contPont1").innerHTML <= 0)
+                    return;
+                document.getElementById("contPont1").innerHTML--;
+                var aux = document.getElementById("resist1").innerHTML;
+                var aux = document.getElementById("resist1").innerHTML;
+                document.getElementById("resist1").innerHTML = (aux < 10 || aux == "") ? 10 : parseInt(aux) + 10;
+            }
+        function menosResist1() {
+                var aux = document.getElementById("resist1").innerHTML;
+                document.getElementById("resist1").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
+                if (aux > 10)
+                    document.getElementById("contPont1").innerHTML++;
+            }
+        function maisPodFogo1() {
+                if (document.getElementById("contPont1").innerHTML <= 0)
+                    return;
+                document.getElementById("contPont1").innerHTML--;
+                var aux = document.getElementById("podFogo1").innerHTML;
+            var aux = document.getElementById("podFogo1").innerHTML;
+            document.getElementById("podFogo1").innerHTML = (aux < 6 || aux == "") ? 6 : parseInt(aux) + 4;
+        }
+        function menosPodFogo1() {
+            var aux = document.getElementById("podFogo1").innerHTML;
+            document.getElementById("podFogo1").innerHTML = (aux <= 6 || aux == "") ? 6 : parseInt(aux) - 4;
+            if (aux > 6)
+                document.getElementById("contPont1").innerHTML++;
+        }
+
+
+        function maisVel2() {
+            if (document.getElementById("contPont2").innerHTML <= 0)
+                return;
+            document.getElementById("contPont2").innerHTML--;
+            var aux = document.getElementById("velM2").innerHTML;
+            var aux = document.getElementById("velM2").innerHTML;
+            document.getElementById("velM2").innerHTML = (aux < 10 || aux == "") ? 10 : parseInt(aux) + 10;
+        }
+        function menosVel2() {
+            var aux = document.getElementById("velM2").innerHTML;
+            document.getElementById("velM2").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
+            if (aux > 10)
+                document.getElementById("contPont2").innerHTML++;
+        }
+        function maisAce2() {
+            if (document.getElementById("contPont2").innerHTML <= 0)
+                return;
+            document.getElementById("contPont2").innerHTML--;
+            var aux = document.getElementById("acel2").innerHTML;
+            document.getElementById("acel2").innerHTML = (aux < 5 || aux == "") ? 5 : parseInt(aux) + 3;
+        }
+        function menosAce2() {
+            var aux = document.getElementById("acel2").innerHTML;
+            document.getElementById("acel2").innerHTML = (aux <= 5 || aux == "") ? 5 : parseInt(aux) - 3;
+            if (aux > 5)
+                document.getElementById("contPont2").innerHTML++;
+        }
+        function maisContr2() {
+            if (document.getElementById("contPont2").innerHTML <= 0)
+                return;
+            document.getElementById("contPont2").innerHTML--;
+            var aux = document.getElementById("contr2").innerHTML;
+            document.getElementById("contr2").innerHTML = (aux < 3 || aux == "") ? 3 : parseInt(aux) + 1;
+        }
+        function menosContr2() {
+            var aux = document.getElementById("contr2").innerHTML;
+            document.getElementById("contr2").innerHTML = (aux <= 3 || aux == "") ? 3 : parseInt(aux) - 1;
+            if (aux > 3)
+                document.getElementById("contPont2").innerHTML++;
+        }
+        function maisMuni2() {
+            if (document.getElementById("contPont2").innerHTML <= 1)
+                return;
+            document.getElementById("contPont2").innerHTML-=2;
+            var aux = document.getElementById("muni2").innerHTML;
+            var aux = document.getElementById("muni2").innerHTML;
+            document.getElementById("muni2").innerHTML = (aux < 1 || aux == "") ? 1 : parseInt(aux) + 1;
+        }
+        function menosMuni2() {
+            var aux = document.getElementById("muni2").innerHTML;
+            document.getElementById("muni2").innerHTML = (aux <= 1 || aux == "") ? 1 : parseInt(aux) - 1;
+            if (aux != 1) {
+                document.getElementById("contPont2").innerHTML++;
+                document.getElementById("contPont2").innerHTML++;
+            }
+        }
+        function maisResist2() {
+            if (document.getElementById("contPont2").innerHTML <= 0)
+                return;
+            document.getElementById("contPont2").innerHTML--;
+            var aux = document.getElementById("resist2").innerHTML;
+            document.getElementById("resist2").innerHTML = (aux < 10 || aux == "") ? 10 : parseInt(aux) + 10;
+        }
+        function menosResist2() {
+            var aux = document.getElementById("resist2").innerHTML;
+            document.getElementById("resist2").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
+            if (aux > 10)
+                document.getElementById("contPont2").innerHTML++;
+        }
+        function maisPodFogo2() {
+            if (document.getElementById("contPont2").innerHTML <= 0)
+                return;
+            document.getElementById("contPont2").innerHTML--;
+            var aux = document.getElementById("podFogo2").innerHTML;
+            document.getElementById("podFogo2").innerHTML = (aux < 6 || aux == "") ? 6: parseInt(aux) + 4;
+        }
+        function menosPodFogo2() {
+            var aux = document.getElementById("podFogo2").innerHTML;
+            document.getElementById("podFogo2").innerHTML = (aux <= 6 || aux == "") ? 6 : parseInt(aux) - 4;
+            if (aux > 6)
+                document.getElementById("contPont2").innerHTML++;
+        }
+
+    </script>
+    <style>
+        #wrapper{
+            display: none;
+        }
+    </style>
+
+<body>
+<div id = "telaInicial">
+<div id="nav">
+    PLAYER 1
+<br>
+    Velocidade
+<button onclick="maisVel1()"> +</button>
+<button onclick="menosVel1()"> -</button>
+    10/1
+<br>
+    Aceleração
+<button onclick="maisAce1()"> +</button>
+<button onclick="menosAce1()"> -</button>
+    &nbsp;&nbsp;3/1
+<br>
+    Controle
+<button onclick="maisContr1()"> +</button>
+<button onclick="menosContr1()"> -</button>
+    &nbsp;&nbsp;1/1
+<br>
+    Munição
+<button onclick="maisMuni1()"> +</button>
+<button onclick="menosMuni1()"> -</button>
+    &nbsp;&nbsp;1/2
+<br>
+    Resistência
+<button onclick="maisResist1()"> +</button>
+<button onclick="menosResist1()"> -</button>
+    10/1
+<br>
+    Poder de Fogo
+<button onclick="maisPodFogo1()"> +</button>
+<button onclick="menosPodFogo1()"> -</button>
+    &nbsp;&nbsp;4/1
+<br>Pontos:&nbsp;<span id="contPont1">50</span><br><br>
+    PLAYER 2
+<br>
+    Velocidade
+<button onclick="maisVel2()"> +</button>
+<button onclick="menosVel2()"> -</button>
+    10/1
+<br>
+    Aceleração
+<button onclick="maisAce2()"> +</button>
+<button onclick="menosAce2()"> -</button>
+    &nbsp;&nbsp;3/1
+<br>
+    Controle
+<button onclick="maisContr2()"> +</button>
+<button onclick="menosContr2()"> -</button>
+    &nbsp;&nbsp;1/1
+<br>
+    Munição
+<button onclick="maisMuni2()"> +</button>
+<button onclick="menosMuni2()"> -</button>
+    &nbsp;&nbsp;1/2
+<br>
+    Resistência
+<button onclick="maisResist2()"> +</button>
+<button onclick="menosResist2()"> -</button>
+    10/1
+<br>
+    Poder de Fogo
+<button onclick="maisPodFogo2()"> +</button>
+<button onclick="menosPodFogo2()"> -</button>
+    &nbsp;&nbsp;4/1
+<br>Pontos:&nbsp;<span id="contPont2">50</span><br><br><br>
+<button onclick="mostrarJogo()"> Iniciar Jogo</button>
+</div>    
+<div id = "Atributos">
+<p class="player1"><b>Player 1: <span id="player1"></span></b></p>
+<p class="velM1"><b>Velocidade Máxima: <span id="velM1">20</span></b></p>
+<p class="acel1"><b>Aceleração: <span id="acel1">5</span></p>
+<p class="contr1"><b>Controle: <span id="contr1">5</span></p>
+<p class="muni1"><b>Munição: <span id="muni1">1</span></b></p>
+<p class="resist1"><b>Resistência: <span id="resist1">20</span></b></p>
+<p class="podFogo1"><b>Poder de Fogo: <span id="podFogo1">10</span></b></p>
+<br>
+<br>
+<p class="player2"><b>Player 2: <span id="player2"></span></b></p>
+<p class="velM2"><b>Velocidade Máxima: <span id="velM2">20</span></b></p>
+<p class="acel2"><b>Aceleração: <span id="acel2">5</span></b></p>
+<p class="contr2"><b>Controle: <span id="contr2">5</span></b></p>
+<p class="muni2"><b>Munição: <span id="muni2">1</span></b></p>
+<p class="resist2"><b>Resistência: <span id="resist2">20</span></b></p>
+<p class="podFogo2"><b>Poder de Fogo: <span id="podFogo2">10</span></b></p>
+
+</div>
+<style>
+body{
+  text-align: left;
+  background: black;
+  color: white;
+  font-family: helvetica;
+}
+h1{
+ text-align: center; 
+}
+p{
+  text-align: center;
+}
+</style>
+</div>
+<div id = "wrapper">
+    
+<button onclick="mostrarTelaInicial()">voltar</button>
+
+
+<div id ="canvas">
+<canvas id="quadro" width=1300 height=640>
+<img src ="Sprites/background0.jpg" id="background0"/>
+<img src ="Sprites/background1.jpg" id="background1"/>
+<img src ="Sprites/background2.jpg" id="background2"/>
+<img src ="Sprites/background3.jpg" id="background3"/>
+<img src ="Sprites/Spacecraft/redSpaceCraft0.png" id="redSpaceCraft0"/>
+<img src ="Sprites/Spacecraft/redSpaceCraft1.png" id="redSpaceCraft1"/>
+<img src ="Sprites/Spacecraft/redSpaceCraft2.png" id="redSpaceCraft2"/>
+<img src ="Sprites/Spacecraft/redSpaceCraft3.png" id="redSpaceCraft3"/>
+<img src ="Sprites/Spacecraft/redSpaceCraft4.png" id="redSpaceCraft4"/>
+<img src ="Sprites/Spacecraft/blackSpaceCraft0.png" id="blackSpaceCraft0"/>
+<img src ="Sprites/Spacecraft/blackSpaceCraft1.png" id="blackSpaceCraft1"/>
+<img src ="Sprites/Spacecraft/blackSpaceCraft2.png" id="blackSpaceCraft2"/>
+<img src ="Sprites/Spacecraft/blackSpaceCraft3.png" id="blackSpaceCraft3"/>
+<img src ="Sprites/Spacecraft/blackSpaceCraft4.png" id="blackSpaceCraft4"/>
+<img src ="Sprites/Spacecraft/blueSpaceCraft0.png" id="blueSpaceCraft0"/>
+<img src ="Sprites/Spacecraft/blueSpaceCraft1.png" id="blueSpaceCraft1"/>
+<img src ="Sprites/Spacecraft/blueSpaceCraft2.png" id="blueSpaceCraft2"/>
+<img src ="Sprites/Spacecraft/blueSpaceCraft3.png" id="blueSpaceCraft3"/>
+<img src ="Sprites/Spacecraft/blueSpaceCraft4.png" id="blueSpaceCraft4"/>
+<img src ="Sprites/Spacecraft/graySpaceCraft0.png" id="graySpaceCraft0"/>
+<img src ="Sprites/Spacecraft/graySpaceCraft1.png" id="graySpaceCraft1"/>
+<img src ="Sprites/Spacecraft/graySpaceCraft2.png" id="graySpaceCraft2"/>
+<img src ="Sprites/Spacecraft/graySpaceCraft3.png" id="graySpaceCraft3"/>
+<img src ="Sprites/Spacecraft/graySpaceCraft4.png" id="graySpaceCraft4"/>
+<img src ="Sprites/Projectile/plasma0.png" id="plasma0"/>
+<img src ="Sprites/Projectile/plasma1.png" id="plasma1"/>
+<img src ="Sprites/Projectile/plasma2.png" id="plasma2"/>
+<img src ="Sprites/Projectile/plasma3.png" id="plasma3"/>
+<img src ="Sprites/Explosion/explosion0.png" id="explosion0"/>
+<img src ="Sprites/Explosion/explosion1.png" id="explosion1"/>
+<img src ="Sprites/Explosion/explosion2.png" id="explosion2"/>
+<img src ="Sprites/Explosion/explosion3.png" id="explosion3"/>
+<img src ="Sprites/Explosion/explosion4.png" id="explosion4"/>
+<img src ="Sprites/Explosion/explosion5.png" id="explosion5"/>
+<img src ="Sprites/Explosion/explosion6.png" id="explosion6"/>
+<img src ="Sprites/Explosion/explosion7.png" id="explosion7"/>
+<img src ="Sprites/Explosion/explosion8.png" id="explosion8"/>
+<img src ="Sprites/Explosion/explosion9.png" id="explosion9"/>
+<img src ="Sprites/Explosion/explosion10.png" id="explosion10"/>
+<img src ="Sprites/Explosion/explosion11.png" id="explosion11"/>
+
+</canvas>
+</div>
+</div>
+
+<style>
+    #quadro {
+    	position: absolute;
+        border: 1px solid #000;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: black;
+    }
+    #nav {
+        text-align: right; 
+        line-height:30px;
+        background-color:#555;
+        min-height:550px;
+        width:200px;
+        float:left;
+        padding:5px;
+    }
+    .player1{
+        font-size: 24px;
+    }
+    .player2{
+        font-size: 24px;
+    }
+    #wrapper{
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+</body>
+<script src="Spacecraft Combat.js">
+</script>
+</html>
+
+
