@@ -10,9 +10,13 @@ fim = false,
 vM1, ac1, dac1, mun1, int1, pf1, vM2, ac2, dac2, mun2, int2, pf2,
 listaRastro = [],
 somImpacto,
-backsound = new sound("Music/Soundtrack.mp3").play(),
+volMusica = 0.5,
+volSom = 0.6,
+backsound = new sound("Music/Soundtrack.mp3").tocarMusica(),
 codigoPad = [],
-auxColisao = null;
+auxColisao = null,
+tempoJogo = 0;
+
 
 function sound(src) {
     this.sound = document.createElement("audio");
@@ -21,10 +25,15 @@ function sound(src) {
     this.sound.setAttribute("controls", "none");
     this.sound.style.display = "none";
     document.body.appendChild(this.sound);
-    this.play = function () {
-        //this.sound.play();
+    this.tocarMusica = function () {
+        this.sound.volume = volMusica;
+        this.sound.play();
     }
-    this.stop = function () {
+    this.tocarSom = function () {
+        this.sound.volume = volSom;
+        this.sound.play();
+    }
+    this.parar = function () {
         this.sound.pause();
     }
 }
@@ -70,6 +79,7 @@ function teclaApertada(evento) {
             nave[indice].pad.padInvestDir = true;
     }
     if (codigoPad[0][evento.keyCode] == "resetar") {
+        for (ind = 0; ind < nave.length; ind++)
         iniciarMundo();
     }
 }
@@ -120,6 +130,11 @@ function Nave(velocidadeMax, aceleracao, desaceleracao, atrasoDisparo , integrid
     this.dimX = dimensaoNaveX;
     this.dimY = dimensaoNaveY;
     this.posY = alturaTela * ((posicaoY == "cima") ? (this.dimY + alturaTela * 0.04) / alturaTela : 1 - ((this.dimY + alturaTela * 0.04) / alturaTela));
+    this.posYbase = this.posY;
+    this.posY += 10;
+    this.velY = 0; // velocidade de flutuação Y
+    this.ordAcelY = 1e-2; // ordem de aceleração de flutuação Y
+    this.acelY = 0; // acelereação de flutuação Y
     this.dimProjX = dimensaoProjetilX;
     this.dimProjY = dimensaoProjetilY;
     this.idImg = idImg;
@@ -138,12 +153,21 @@ function Nave(velocidadeMax, aceleracao, desaceleracao, atrasoDisparo , integrid
     this.time = posicaoY;
 
     this.atualizarPosicao = function () {
-        if (this.atrDisp > 0)
+        let velYMax = 2;
+        this.velY = (this.velY > velYMax) ? velYMax : (this.velY < -velYMax) ? -velYMax : this.velY;
+        this.posY += this.velY;
+        this.posY = (this.posY > alturaTela * 0.89) ? alturaTela * 0.89 : (this.posY < alturaTela * 0.11) ? alturaTela * 0.11 : this.posY;
+        let auxFlut = this.posYbase - this.posY;
+        this.acelY = this.ordAcelY * auxFlut;
+        this.velY = this.velY + this.acelY/4;
+        this.velY = this.velY * 0.999;
+        if(this.atrDisp > 0)
             this.atrDisp--;
         this.posX += this.vel;
     };
 
-    this.atualizarIntegridade = function (dano) {
+    this.colisao = function (dano, velProj, sentProj) {
+        this.velY = velProj * sentProj / 4;
         this.integ -= dano;
         switch (true) {
             case this.integ < (this.integTotal * 0.2):
@@ -158,6 +182,7 @@ function Nave(velocidadeMax, aceleracao, desaceleracao, atrasoDisparo , integrid
             case this.integ < (this.integTotal * 0.8):
                 this.img =  document.getElementById(idImg + 1);
         }
+        imgFundoTela.efeitFlag = true;
     };
 
     this.movimentar = function (modAceler, modDirec) {
@@ -185,7 +210,7 @@ function Nave(velocidadeMax, aceleracao, desaceleracao, atrasoDisparo , integrid
                 break;
             default:
                 if(this.direc != 0)
-                    this.direc += 5 * ((this.direc>0)?-1:1);
+                    this.direc += 2.5 * ((this.direc>0)?-1:1);
         }
         if (Math.abs(this.direc) >= 45) 
             this.direc = 45 * ((this.direc>0)?1:-1);
@@ -286,7 +311,7 @@ function desenharRastro(rastro) {
 }
 
 function desenharBarras(nave, cContorno, cInterno, dim) {
-    dist = nave.posY + ((nave.posY < alturaTela / 2) ? -nave.dimY - alturaTela * 0.02 : nave.dimY + alturaTela * 0.01);
+    dist = (nave.posYbase + nave.posY) / 2 + (((nave.posYbase + nave.posY) / 2 < alturaTela / 2) ? -nave.dimY - alturaTela * 0.02 : nave.dimY + alturaTela * 0.01);
     Ctx.beginPath();
     if (nave.integ > 0) {
         comprimento = dim * nave.integ / nave.integTotal;
@@ -343,13 +368,20 @@ function FundoTela(img) {
     this.img = img;
     this.imgW = img.width;
     this.imgH = img.height;
-        this.auxA = alturaTela / this.imgH;
-        this.auxB = larguraTela / this.imgW;
-        this.ajuste = (this.auxA > this.auxB) ? this.auxA : this.auxB;
-        this.dimX = this.imgW * this.ajuste;
-        this.dimY = parseInt(this.imgH * this.ajuste);
-        this.posX = Math.floor(Math.random() * (this.dimX - larguraTela));
-        this.posY = Math.floor(Math.random() * (this.dimY - alturaTela));
+    this.auxA = alturaTela / this.imgH;
+    this.auxB = larguraTela / this.imgW;
+    this.ajuste = (this.auxA > this.auxB) ? this.auxA : this.auxB;
+    this.dimX = this.imgW * this.ajuste;
+    this.dimY = parseInt(this.imgH * this.ajuste);
+    this.posX = Math.floor(Math.random() * (this.dimX - larguraTela));
+    this.posY = Math.floor(Math.random() * (this.dimY - alturaTela));
+    this.efeitTam = 0;
+    this.efeitAlph = 1;
+    this.efeitFlag = false;
+    this.momento = 0;
+    this.freqAtua = 1000;
+    this.ultContTemp = tempoJogo;
+    this.propLA = larguraTela / alturaTela;
 
     this.desenharFundoTela = function () {
         Ctx.save();
@@ -357,12 +389,47 @@ function FundoTela(img) {
         Ctx.drawImage(this.img, 0, 0, this.dimX, this.dimY);
         Ctx.restore();
     };
+
+    this.desenharFundoTelaEfeito = function () {
+        if (this.efeitFlag) {
+            Ctx.save();
+            Ctx.globalAlpha = this.efeitAlph;
+            Ctx.translate(-this.posX - this.efeitTam*this.propLA, -this.posY - this.efeitTam);
+            Ctx.drawImage(this.img, 0, 0, this.dimX + 2 * this.efeitTam * this.propLA, this.dimY + 2 * this.efeitTam);
+            Ctx.globalAlpha = 1;
+            Ctx.restore();
+            this.efeitAlph -= 0.01;
+            if (this.efeitAlph <= 0) {
+                this.efeitTam = 0;
+                this.efeitAlph = 1;
+                this.efeitFlag = false;
+            }
+            else {
+                this.efeitTam += 0.3;
+            }
+        } else {
+            if (tempoJogo > this.ultContTemp + this.freqAtua) {
+                this.ultContTemp = tempoJogo;
+                let auxA = 1, auxB = 1;
+
+                for (indice = 0; indice < nave.length; indice++) {
+                    auxA += parseInt(nave[indice].integTotal);
+                    auxB += parseInt(nave[indice].integ);
+                }
+                this.freqAtua = parseInt(10000 * auxB / auxA);
+                console.log(this.freqAtua);
+                let random = Math.floor(Math.random() * auxA);
+                this.efeitFlag = (random > auxB) ? true : false;
+            }
+        }   
+    };
 }
 
 function desenharMundo() {
     if (!fim) {
         //desenhando fundo de tela
         imgFundoTela.desenharFundoTela();
+        imgFundoTela.desenharFundoTelaEfeito();
 
         //desenhando naves
         for (indice = 0; indice < nave.length; indice++)
@@ -447,12 +514,13 @@ function calcularColisao(objetoA, objetoB, margem) {
 
 function calcularColisaoNaveProjetil(nave, projetil, margem) {
     if (calcularColisao(projetil, nave, margem)) {
-        nave.atualizarIntegridade(projetil.potencia);
+        //nave.colisao(projetil.potencia)
+        nave.colisao(projetil.potencia, projetil.velY, projetil.sent);
         if (!projetil.colidiu) {
             projetil.colidiu = true;
             listaExplosoes.push(new Explosao((nave.posX + projetil.posX) / 2,
                                              (nave.posY + projetil.posY) / 2));
-            somImpacto = new sound("Effects/explosao1.ogg").play();
+            somImpacto = new sound("Effects/explosao1.ogg").tocarSom();
         }
     }
 }
@@ -483,7 +551,7 @@ function calcularColisaoProjetil(projetilA, projetilB, margem) {
     if (calcularColisao(projetilA, projetilB, margem)) {
         listaExplosoes.push(new Explosao((projetilA.posX + projetilB.posX) / 2,
                                          (projetilA.posY + projetilB.posY) / 2));
-        somImpacto = new sound("Effects/explosao2.ogg").play();
+        somImpacto = new sound("Effects/explosao2.ogg").tocarSom();
         let potenciaAuxB = projetilB.potencia;
         let potenciaAuxA = projetilA.potencia;
         projetilA.colisao(potenciaAuxB);
@@ -576,8 +644,9 @@ function entradasNave(nave) {
     }
     if (nave.pad.padDisp) {
         if (nave.atrDisp == 0) {
-            somImpacto = new sound("Effects/disparo.ogg").play();
+            somImpacto = new sound("Effects/disparo.ogg").tocarSom();
             nave.atrDisp = nave.atrDispT;
+            nave.velY += ((nave.posY > alturaTela / 2) ? 1 : -1)*2;
             nave.listaProjetil.push(new Projetil(nave.posX, nave.posY, nave.dimProjX, nave.dimProjY, nave.vel / 2, 10, nave.potDisparo, ((nave.posY > alturaTela / 2) ? -1 : 1), nave.direc));
         }
     }
@@ -609,10 +678,6 @@ function calculandoExcedenciaNave(nave) {
         nave.posX += larguraTela;
     else if (nave.posX > larguraTela)
         nave.posX -= larguraTela;
-}
-
-function executarRotina(nave) {
-
 }
 
 function atualizarMundo() {
@@ -648,9 +713,10 @@ function atualizarMundo() {
 }
 
 function gameLoop(tempo) {
-            atualizarMundo();
-            desenharMundo();
-        requestAnimationFrame(gameLoop, Canvas);
+    tempoJogo = parseInt(tempo);
+    atualizarMundo();
+    desenharMundo();
+    requestAnimationFrame(gameLoop, Canvas);
 }
 
 iniciarMundo();
