@@ -19,175 +19,22 @@
             $("#telaInicial").show();
         }
 
-
-        function maisVel1() {
-            if (document.getElementById("contPont1").innerHTML <= 0)
+        function maisAtributo(pontuacao, atributo, max, custo, passo) {
+            if (document.getElementById(pontuacao).innerHTML < custo)
                 return;
-            document.getElementById("contPont1").innerHTML--;
-            var aux = document.getElementById("velM1").innerHTML;
-            document.getElementById("velM1").innerHTML=(aux < 10|| aux == "")?10:parseInt(aux) + 10;
-        }
-        function menosVel1() {
-            var aux = document.getElementById("velM1").innerHTML;
-            document.getElementById("velM1").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
-            if(aux>10)
-                document.getElementById("contPont1").innerHTML++;
-        }
-        function maisAce1() {
-            if (document.getElementById("contPont1").innerHTML <= 0)
+            if (document.getElementById(atributo).innerHTML >= max && max != 0)
                 return;
-            document.getElementById("contPont1").innerHTML--;
-            var aux = document.getElementById("acel1").innerHTML;
-            var aux = document.getElementById("acel1").innerHTML;
-            document.getElementById("acel1").innerHTML = (aux < 5 || aux == "") ? 5 : parseInt(aux) + 3;
-        }
-        function menosAce1() {
-            var aux = document.getElementById("acel1").innerHTML;
-            document.getElementById("acel1").innerHTML = (aux <= 5 || aux == "") ? 5 : parseInt(aux) - 3;
-            if (aux > 5)
-                document.getElementById("contPont1").innerHTML++;
-        }
-        function maisContr1() {
-            if (document.getElementById("contPont1").innerHTML <= 0)
-                return;
-            document.getElementById("contPont1").innerHTML--;
-            var aux = document.getElementById("contr1").innerHTML;
-                var aux = document.getElementById("contr1").innerHTML;
-                document.getElementById("contr1").innerHTML=(aux < 3|| aux == "")?3:parseInt(aux)+1;
-       }
-        function menosContr1()  {
-                var aux = document.getElementById("contr1").innerHTML;
-                document.getElementById("contr1").innerHTML = (aux <= 3 || aux == "") ? 3 : parseInt(aux) - 1;
-                if (aux > 3)
-                    document.getElementById("contPont1").innerHTML++;
-            }
-        function maisMuni1() {
-                if (document.getElementById("contPont1").innerHTML <= 1)
-                    return;
-                document.getElementById("contPont1").innerHTML-=2;
-                var aux = document.getElementById("muni1").innerHTML;
-                var aux = document.getElementById("muni1").innerHTML;
-                document.getElementById("muni1").innerHTML = (aux < 1 || aux == "") ? 1 : parseInt(aux) + 1;
-            }
-        function menosMuni1() {
-                var aux = document.getElementById("muni1").innerHTML;
-                document.getElementById("muni1").innerHTML = (aux <= 1 || aux == "") ? 1 : parseInt(aux) - 1;
-                if (aux != 1) {
-                    document.getElementById("contPont1").innerHTML++;
-                    document.getElementById("contPont1").innerHTML++;
-                }
-            }
-        function maisResist1() {
-                if (document.getElementById("contPont1").innerHTML <= 0)
-                    return;
-                document.getElementById("contPont1").innerHTML--;
-                var aux = document.getElementById("resist1").innerHTML;
-                var aux = document.getElementById("resist1").innerHTML;
-                document.getElementById("resist1").innerHTML = (aux < 10 || aux == "") ? 10 : parseInt(aux) + 10;
-            }
-        function menosResist1() {
-                var aux = document.getElementById("resist1").innerHTML;
-                document.getElementById("resist1").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
-                if (aux > 10)
-                    document.getElementById("contPont1").innerHTML++;
-            }
-        function maisPodFogo1() {
-                if (document.getElementById("contPont1").innerHTML <= 0)
-                    return;
-                document.getElementById("contPont1").innerHTML--;
-                var aux = document.getElementById("podFogo1").innerHTML;
-            var aux = document.getElementById("podFogo1").innerHTML;
-            document.getElementById("podFogo1").innerHTML = (aux < 6 || aux == "") ? 6 : parseInt(aux) + 4;
-        }
-        function menosPodFogo1() {
-            var aux = document.getElementById("podFogo1").innerHTML;
-            document.getElementById("podFogo1").innerHTML = (aux <= 6 || aux == "") ? 6 : parseInt(aux) - 4;
-            if (aux > 6)
-                document.getElementById("contPont1").innerHTML++;
+            document.getElementById(pontuacao).innerHTML -= custo;
+            var aux = document.getElementById(atributo).innerHTML;
+            document.getElementById(atributo).innerHTML = parseInt(aux) + passo;
         }
 
-
-        function maisVel2() {
-            if (document.getElementById("contPont2").innerHTML <= 0)
-                return;
-            document.getElementById("contPont2").innerHTML--;
-            var aux = document.getElementById("velM2").innerHTML;
-            var aux = document.getElementById("velM2").innerHTML;
-            document.getElementById("velM2").innerHTML = (aux < 10 || aux == "") ? 10 : parseInt(aux) + 10;
-        }
-        function menosVel2() {
-            var aux = document.getElementById("velM2").innerHTML;
-            document.getElementById("velM2").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
-            if (aux > 10)
-                document.getElementById("contPont2").innerHTML++;
-        }
-        function maisAce2() {
-            if (document.getElementById("contPont2").innerHTML <= 0)
-                return;
-            document.getElementById("contPont2").innerHTML--;
-            var aux = document.getElementById("acel2").innerHTML;
-            document.getElementById("acel2").innerHTML = (aux < 5 || aux == "") ? 5 : parseInt(aux) + 3;
-        }
-        function menosAce2() {
-            var aux = document.getElementById("acel2").innerHTML;
-            document.getElementById("acel2").innerHTML = (aux <= 5 || aux == "") ? 5 : parseInt(aux) - 3;
-            if (aux > 5)
-                document.getElementById("contPont2").innerHTML++;
-        }
-        function maisContr2() {
-            if (document.getElementById("contPont2").innerHTML <= 0)
-                return;
-            document.getElementById("contPont2").innerHTML--;
-            var aux = document.getElementById("contr2").innerHTML;
-            document.getElementById("contr2").innerHTML = (aux < 3 || aux == "") ? 3 : parseInt(aux) + 1;
-        }
-        function menosContr2() {
-            var aux = document.getElementById("contr2").innerHTML;
-            document.getElementById("contr2").innerHTML = (aux <= 3 || aux == "") ? 3 : parseInt(aux) - 1;
-            if (aux > 3)
-                document.getElementById("contPont2").innerHTML++;
-        }
-        function maisMuni2() {
-            if (document.getElementById("contPont2").innerHTML <= 1)
-                return;
-            document.getElementById("contPont2").innerHTML-=2;
-            var aux = document.getElementById("muni2").innerHTML;
-            var aux = document.getElementById("muni2").innerHTML;
-            document.getElementById("muni2").innerHTML = (aux < 1 || aux == "") ? 1 : parseInt(aux) + 1;
-        }
-        function menosMuni2() {
-            var aux = document.getElementById("muni2").innerHTML;
-            document.getElementById("muni2").innerHTML = (aux <= 1 || aux == "") ? 1 : parseInt(aux) - 1;
-            if (aux != 1) {
-                document.getElementById("contPont2").innerHTML++;
-                document.getElementById("contPont2").innerHTML++;
+        function menosAtributo(pontuacao, atributo, min, custo, passo) {
+            var aux = document.getElementById(atributo).innerHTML;
+            document.getElementById(atributo).innerHTML = (aux <= min || aux == "") ? min : parseInt(aux) - passo;
+            if (aux > min) {
+                document.getElementById(pontuacao).innerHTML = parseInt(document.getElementById(pontuacao).innerHTML) + custo;
             }
-        }
-        function maisResist2() {
-            if (document.getElementById("contPont2").innerHTML <= 0)
-                return;
-            document.getElementById("contPont2").innerHTML--;
-            var aux = document.getElementById("resist2").innerHTML;
-            document.getElementById("resist2").innerHTML = (aux < 10 || aux == "") ? 10 : parseInt(aux) + 10;
-        }
-        function menosResist2() {
-            var aux = document.getElementById("resist2").innerHTML;
-            document.getElementById("resist2").innerHTML = (aux <= 10 || aux == "") ? 10 : parseInt(aux) - 10;
-            if (aux > 10)
-                document.getElementById("contPont2").innerHTML++;
-        }
-        function maisPodFogo2() {
-            if (document.getElementById("contPont2").innerHTML <= 0)
-                return;
-            document.getElementById("contPont2").innerHTML--;
-            var aux = document.getElementById("podFogo2").innerHTML;
-            document.getElementById("podFogo2").innerHTML = (aux < 6 || aux == "") ? 6: parseInt(aux) + 4;
-        }
-        function menosPodFogo2() {
-            var aux = document.getElementById("podFogo2").innerHTML;
-            document.getElementById("podFogo2").innerHTML = (aux <= 6 || aux == "") ? 6 : parseInt(aux) - 4;
-            if (aux > 6)
-                document.getElementById("contPont2").innerHTML++;
         }
 
     </script>
@@ -203,88 +50,70 @@
     PLAYER 1
 <br>
     Velocidade
-<button onclick="maisVel1()"> +</button>
-<button onclick="menosVel1()"> -</button>
-    10/1
+<button onclick='maisAtributo("contPont1","velM1", 0, 1, 10)'> +</button>
+<button onclick='menosAtributo("contPont1","velM1", 10, 1, 10)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p: 10&nbsp;&nbsp;&nbsp;valor:<span id="velM1">20</span>
 <br>
-    Aceleração
-<button onclick="maisAce1()"> +</button>
-<button onclick="menosAce1()"> -</button>
-    &nbsp;&nbsp;3/1
+    AceleraÃ§Ã£o
+<button onclick='maisAtributo("contPont1","acel1", 0, 1, 3)'> +</button>
+<button onclick='menosAtributo("contPont1","acel1", 5, 1, 3)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;valor:<span id="acel1">5</span>
 <br>
     Controle
-<button onclick="maisContr1()"> +</button>
-<button onclick="menosContr1()"> -</button>
-    &nbsp;&nbsp;1/1
+<button onclick='maisAtributo("contPont1","contr1", 0, 2, 3)'> +</button>
+<button onclick='menosAtributo("contPont1","contr1", 2, 2, 3)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 2&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;valor:<span id="contr1">5</span>
 <br>
-    Munição
-<button onclick="maisMuni1()"> +</button>
-<button onclick="menosMuni1()"> -</button>
-    &nbsp;&nbsp;1/2
+    MuniÃ§Ã£o
+<button onclick='maisAtributo("contPont1","muni1", 30, 2, 1)'> +</button>
+<button onclick='menosAtributo("contPont1","muni1", 1, 2, 1)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 2&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;valor:<span id="muni1">1</span>
 <br>
-    Resistência
-<button onclick="maisResist1()"> +</button>
-<button onclick="menosResist1()"> -</button>
-    10/1
+    ResistÃªncia
+<button onclick='maisAtributo("contPont1","resist1", 0, 1, 10)'> +</button>
+<button onclick='menosAtributo("contPont1","resist1", 10, 1, 10)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p: 10&nbsp;&nbsp;&nbsp;valor:<span id="resist1">20</span>
 <br>
     Poder de Fogo
-<button onclick="maisPodFogo1()"> +</button>
-<button onclick="menosPodFogo1()"> -</button>
-    &nbsp;&nbsp;4/1
-<br>Pontos:&nbsp;<span id="contPont1">50</span><br><br>
+<button onclick='maisAtributo("contPont1","podFogo1", 0, 1, 4)'> +</button>
+<button onclick='menosAtributo("contPont1","podFogo1", 6, 1, 4)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;valor:<span id="podFogo1">10</span>
+<br>Pontos:&nbsp;<span id="contPont1">70</span><br><br>
     PLAYER 2
 <br>
     Velocidade
-<button onclick="maisVel2()"> +</button>
-<button onclick="menosVel2()"> -</button>
-    10/1
+<button onclick='maisAtributo("contPont2","velM2", 0, 1, 10)'> +</button>
+<button onclick='menosAtributo("contPont2","velM2", 10, 1, 10)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p: 10&nbsp;&nbsp;&nbsp;valor:<span id="velM2">20</span>
 <br>
-    Aceleração
-<button onclick="maisAce2()"> +</button>
-<button onclick="menosAce2()"> -</button>
-    &nbsp;&nbsp;3/1
+    AceleraÃ§Ã£o
+<button onclick='maisAtributo("contPont2","acel2", 0, 1, 3)'> +</button>
+<button onclick='menosAtributo("contPont2","acel2", 5, 1, 3)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;valor:<span id="acel2">5</span>
 <br>
     Controle
-<button onclick="maisContr2()"> +</button>
-<button onclick="menosContr2()"> -</button>
-    &nbsp;&nbsp;1/1
+<button onclick='maisAtributo("contPont2","contr2", 0, 2, 3)'> +</button>
+<button onclick='menosAtributo("contPont2","contr2", 2, 2, 3)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 2&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;3&nbsp;&nbsp;&nbsp;valor:<span id="contr2">5</span>
 <br>
-    Munição
-<button onclick="maisMuni2()"> +</button>
-<button onclick="menosMuni2()"> -</button>
-    &nbsp;&nbsp;1/2
+    MuniÃ§Ã£o
+<button onclick='maisAtributo("contPont2","muni2", 30, 2, 1)'> +</button>
+<button onclick='menosAtributo("contPont2","muni2", 1, 2, 1)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 2&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;valor:<span id="muni2">1</span>
 <br>
-    Resistência
-<button onclick="maisResist2()"> +</button>
-<button onclick="menosResist2()"> -</button>
-    10/1
+    ResistÃªncia
+<button onclick='maisAtributo("contPont2","resist2", 0, 1, 10)'> +</button>
+<button onclick='menosAtributo("contPont2","resist2", 10, 1, 10)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p: 10&nbsp;&nbsp;&nbsp;valor:<span id="resist2">20</span>
 <br>
     Poder de Fogo
-<button onclick="maisPodFogo2()"> +</button>
-<button onclick="menosPodFogo2()"> -</button>
-    &nbsp;&nbsp;4/1
-<br>Pontos:&nbsp;<span id="contPont2">50</span><br><br><br>
+<button onclick='maisAtributo("contPont2","podFogo2", 0, 1, 4)'> +</button>
+<button onclick='menosAtributo("contPont2","podFogo2", 6, 1, 4)'> -</button>
+    &nbsp;&nbsp;&nbsp;c: 1&nbsp;&nbsp;&nbsp; p:&nbsp;&nbsp;&nbsp;4&nbsp;&nbsp;&nbsp;valor:<span id="podFogo2">10</span>
+<br>Pontos:&nbsp;<span id="contPont2">70</span><br><br><br>
 <button onclick="mostrarJogo()"> Iniciar Jogo</button>
 </div>    
-<div id = "Atributos">
-<p class="player1"><b>Player 1: <span id="player1"></span></b></p>
-<p class="velM1"><b>Velocidade Máxima: <span id="velM1">20</span></b></p>
-<p class="acel1"><b>Aceleração: <span id="acel1">5</span></p>
-<p class="contr1"><b>Controle: <span id="contr1">5</span></p>
-<p class="muni1"><b>Munição: <span id="muni1">1</span></b></p>
-<p class="resist1"><b>Resistência: <span id="resist1">20</span></b></p>
-<p class="podFogo1"><b>Poder de Fogo: <span id="podFogo1">10</span></b></p>
-<br>
-<br>
-<p class="player2"><b>Player 2: <span id="player2"></span></b></p>
-<p class="velM2"><b>Velocidade Máxima: <span id="velM2">20</span></b></p>
-<p class="acel2"><b>Aceleração: <span id="acel2">5</span></b></p>
-<p class="contr2"><b>Controle: <span id="contr2">5</span></b></p>
-<p class="muni2"><b>Munição: <span id="muni2">1</span></b></p>
-<p class="resist2"><b>Resistência: <span id="resist2">20</span></b></p>
-<p class="podFogo2"><b>Poder de Fogo: <span id="podFogo2">10</span></b></p>
 
-</div>
 <style>
 body{
   text-align: left;
@@ -311,6 +140,8 @@ p{
 <img src ="Sprites/background1.jpg" id="background1"/>
 <img src ="Sprites/background2.jpg" id="background2"/>
 <img src ="Sprites/background3.jpg" id="background3"/>
+<img src ="Sprites/background4.jpg" id="background4"/>
+<img src ="Sprites/background5.jpg" id="background5"/>
 <img src ="Sprites/Spacecraft/redSpaceCraft0.png" id="redSpaceCraft0"/>
 <img src ="Sprites/Spacecraft/redSpaceCraft1.png" id="redSpaceCraft1"/>
 <img src ="Sprites/Spacecraft/redSpaceCraft2.png" id="redSpaceCraft2"/>
@@ -366,7 +197,7 @@ p{
         line-height:30px;
         background-color:#555;
         min-height:550px;
-        width:200px;
+        min-width:200px;
         float:left;
         padding:5px;
     }
