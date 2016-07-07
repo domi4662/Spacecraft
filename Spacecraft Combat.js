@@ -10,31 +10,36 @@ fim = false,
 vM1, ac1, dac1, mun1, int1, pf1, vM2, ac2, dac2, mun2, int2, pf2,
 listaRastro = [],
 somImpacto,
-volMusica = 0.5,
-volSom = 0.6,
-backsound = new sound("Music/Soundtrack.mp3").tocarMusica(),
+volMusica = 0.8,
+volSom = 1.0,
+musicaFundo = new Audio("Music/Soundtrack.mp3").tocarMusica(),
 codigoPad = [],
 auxColisao = null,
-tempoJogo = 0;
+tempoJogo = 0,
+repeticaoGrafica = [],
+repeticaoSonora = [],
+repetPonteiro = 0,
+ultimosMomentos = null,
+flagUltmidosMomentos = false;
 
 
-function sound(src) {
-    this.sound = document.createElement("audio");
-    this.sound.src = "Sound/" + src;
-    this.sound.setAttribute("preload", "auto");
-    this.sound.setAttribute("controls", "none");
-    this.sound.style.display = "none";
-    document.body.appendChild(this.sound);
+function Audio(src) {
+    this.audio = document.createElement("audio");
+    this.audio.src = "Sound/" + src;
+    this.audio.setAttribute("preload", "auto");
+    this.audio.setAttribute("controls", "none");
+    this.audio.style.display = "none";
+    document.body.appendChild(this.audio);
     this.tocarMusica = function () {
-        this.sound.volume = volMusica;
-        this.sound.play();
+        this.audio.volume = volMusica;
+        this.audio.play();
     }
     this.tocarSom = function () {
-        this.sound.volume = volSom;
-        this.sound.play();
+        this.audio.volume = volSom;
+        this.audio.play();
     }
     this.parar = function () {
-        this.sound.pause();
+        this.audio.pause();
     }
 }
 
@@ -78,9 +83,13 @@ function teclaApertada(evento) {
         if (codigoPad[indice + 1][evento.keyCode] == "investidaD")
             nave[indice].pad.padInvestDir = true;
     }
-    if (codigoPad[0][evento.keyCode] == "resetar") {
-        for (ind = 0; ind < nave.length; ind++)
+    if (codigoPad[0][evento.keyCode] == "resetar")
         iniciarMundo();
+    if (codigoPad[0][evento.keyCode] == "testar") {
+        for (indice = 0; indice < nave.length; indice++) {
+            console.log(indice);
+            console.log(nave[indice]);
+        }
     }
 }
 
@@ -253,8 +262,8 @@ function iniciarMundo() {
 
     iniciarVariaveis();
     
-    nave.push(new Nave(vM1, ac1, dac1, mun1 , int1, pf1, "baixo", "redSpaceCraft", 64, 64, 35, 40, "red", "blue"));
-    nave.push(new Nave(vM2, ac2, dac2, mun2, int2, pf2, "cima", "blackSpaceCraft", 64, 64, 35, 40, "blue", "red"));
+    nave.push(new Nave(vM1, ac1, dac1, mun1 , int1, pf1, "baixo", "redSpaceCraft", 64, 64, 35, 40, "blue", "red"));
+    nave.push(new Nave(vM2, ac2, dac2, mun2, int2, pf2, "cima", "blackSpaceCraft", 64, 64, 35, 40, "red", "blue"));
   
     window.addEventListener("keydown", teclaApertada);
     window.addEventListener("keyup", teclaLiberada);
@@ -267,6 +276,11 @@ function iniciarVariaveis() {
     
     listaExplosoes = [];
     listaRastro = [];
+    repeticaoGrafica = [];
+    repeticaoSonora = [];
+    repetPonteiro = 0;
+    ultimosMomentos = null,
+    flagUltmidosMomentos = false;
     fim = false;
     vM1 = document.getElementById("velM1").innerHTML;
     ac1 = document.getElementById("acel1").innerHTML;
@@ -298,51 +312,67 @@ function iniciarVariaveis() {
         90: "investidaE",
         67: "investidaD"
     };
-    codigoPad[0] = {82: "resetar"};
+    codigoPad[0] = {
+        82: "resetar",
+        80: "testar"
+    };
 }
 
-function desenharRastro(rastro) {
+function desenharRastro(rastro, quadro) {
     rastro.qtRestante--;
     if (rastro.qtRestante <= 0)
         return true;
-    desenharObjeto(rastro.posX, rastro.posY, rastro.dimX, rastro.dimY, rastro.direc, rastro.alpha, rastro.img);
+    desenharObjeto(rastro.posX, rastro.posY, rastro.dimX, rastro.dimY, rastro.direc, rastro.alpha, rastro.img, quadro);
     rastro.alpha -= rastro.aRedut;
     return false;
 }
 
-function desenharBarras(nave, cContorno, cInterno, dim) {
+function desenharBarras(nave) {
     dist = (nave.posYbase + nave.posY) / 2 + (((nave.posYbase + nave.posY) / 2 < alturaTela / 2) ? -nave.dimY - alturaTela * 0.02 : nave.dimY + alturaTela * 0.01);
     Ctx.beginPath();
     if (nave.integ > 0) {
-        comprimento = dim * nave.integ / nave.integTotal;
+        comprimento = nave.dimX * nave.integ / nave.integTotal;
         Ctx.rect(nave.posX - comprimento, dist, 2 * comprimento, alturaTela * 0.01);
-        if (nave.posX > larguraTela - dim)
+        if (nave.posX > larguraTela - nave.dimX)
             Ctx.rect(nave.posX - comprimento - larguraTela, dist, 2 * comprimento, alturaTela * 0.01);
-        else if (nave.posX < dim)
+        else if (nave.posX < nave.dimX)
             Ctx.rect(nave.posX - comprimento + larguraTela, dist, 2 * comprimento, alturaTela * 0.01);
-        Ctx.fillStyle = cContorno;
+        Ctx.fillStyle = nave.corExtBar;
         Ctx.fill();
         Ctx.lineWidth = 1;
-        Ctx.strokeStyle = cInterno;
+        Ctx.strokeStyle = nave.corIntBar;
         Ctx.stroke();
     }
 }
 
-function desenhandoDisparos(listaProjetil){
+function desenhandoDisparos(listaProjetil, quadro) {
     for (i = 0 ; i < listaProjetil.length ; i++) {
-        desenharObjeto(listaProjetil[i].posX, listaProjetil[i].posY, listaProjetil[i].dimX, listaProjetil[i].dimY, 0, 1, listaProjetil[i].img);
+        desenharObjeto(listaProjetil[i].posX, listaProjetil[i].posY, listaProjetil[i].dimX, listaProjetil[i].dimY, 0, 1, listaProjetil[i].img, quadro);
 
         //desenhando excendencias de dispros
         if (listaProjetil[i].posX + listaProjetil[i].dimX >= larguraTela)
-            desenharObjeto(listaProjetil[i].posX - larguraTela, listaProjetil[i].posY, listaProjetil[i].dimX, listaProjetil[i].dimY, 0, 1, listaProjetil[i].img);
+            desenharObjeto(listaProjetil[i].posX - larguraTela, listaProjetil[i].posY, listaProjetil[i].dimX, listaProjetil[i].dimY, 0, 1, listaProjetil[i].img, quadro);
         if (listaProjetil[i].posX - listaProjetil[i].dimX <= 0)
-            desenharObjeto(listaProjetil[i].posX + larguraTela, listaProjetil[i].posY, listaProjetil[i].dimX, listaProjetil[i].dimY, 0, 1, listaProjetil[i].img);
+            desenharObjeto(listaProjetil[i].posX + larguraTela, listaProjetil[i].posY, listaProjetil[i].dimX, listaProjetil[i].dimY, 0, 1, listaProjetil[i].img), quadro;
 
         listaRastro.push(new Rastro(listaProjetil[i].posX, listaProjetil[i].posY, listaProjetil[i].dimX, listaProjetil[i].dimY, 0.2, 10, 0, listaProjetil[i].img));
     }
 }
 
-function desenharObjeto(posX, posY, dimX, dimY, angulo, alpha, img) {
+function ComponenteVisual(posX, posY, dimX, dimY, angulo, alpha, img){
+    this.posX = posX;
+    this.posY = posY;
+    this.dimX = dimX;
+    this.dimY = dimY;
+    this.angulo = angulo;
+    this.alpha = alpha;
+    this.img = img;
+}
+
+function desenharObjeto(posX, posY, dimX, dimY, angulo, alpha, img, quadro) {
+    try {
+        quadro.push(new ComponenteVisual(posX, posY, dimX, dimY, angulo, alpha, img));
+    } catch (err) {}
     Ctx.globalAlpha = alpha;
     Ctx.save();
     Ctx.translate(posX, posY);
@@ -352,16 +382,16 @@ function desenharObjeto(posX, posY, dimX, dimY, angulo, alpha, img) {
     Ctx.globalAlpha = 1;
 }
 
-function desenharNave(nave){
+function desenharNave(nave, quadro) {
     angulo = nave.direcIni+(nave.direc * ((nave.direcIni == 0) ? 1 : -1));
-    desenharObjeto(nave.posX, nave.posY, nave.dimX, nave.dimY, angulo, 1, nave.img);
+    desenharObjeto(nave.posX, nave.posY, nave.dimX, nave.dimY, angulo, 1, nave.img, quadro);
     let velMod = Math.abs(nave.vel)/5;
     if(velMod > 3)
     listaRastro.push(new Rastro(nave.posX, nave.posY, nave.dimX, nave.dimY, 0.2, velMod ,nave.direc, nave.img));
     if (nave.posX > larguraTela - nave.dimX)
-        desenharObjeto(nave.posX - larguraTela, nave.posY, nave.dimX, nave.dimY, angulo, 1, nave.img);
+        desenharObjeto(nave.posX - larguraTela, nave.posY, nave.dimX, nave.dimY, angulo, 1, nave.img, quadro);
     else if (nave.posX < nave.dimX)
-        desenharObjeto(nave.posX + larguraTela, nave.posY, nave.dimX, nave.dimY, angulo, 1, nave.img);
+        desenharObjeto(nave.posX + larguraTela, nave.posY, nave.dimX, nave.dimY, angulo, 1, nave.img, quadro);
 }
 
 function FundoTela(img) {
@@ -417,7 +447,6 @@ function FundoTela(img) {
                     auxB += parseInt(nave[indice].integ);
                 }
                 this.freqAtua = parseInt(10000 * auxB / auxA);
-                console.log(this.freqAtua);
                 let random = Math.floor(Math.random() * auxA);
                 this.efeitFlag = (random > auxB) ? true : false;
             }
@@ -426,59 +455,48 @@ function FundoTela(img) {
 }
 
 function desenharMundo() {
-    if (!fim) {
+        let quadro = [];
         //desenhando fundo de tela
         imgFundoTela.desenharFundoTela();
         imgFundoTela.desenharFundoTelaEfeito();
 
         //desenhando naves
         for (indice = 0; indice < nave.length; indice++)
-            desenharNave(nave[indice]);
+            desenharNave(nave[indice], quadro);
 
         //desenhando disparos
         for (indice = 0; indice < nave.length; indice++)
-            desenhandoDisparos(nave[indice].listaProjetil);
+            desenhandoDisparos(nave[indice].listaProjetil, quadro);
 
         //desenhando rastros
         for (indice = 0 ; indice < listaRastro.length ; indice++)
-            if (desenharRastro(listaRastro[indice]))
+            if (desenharRastro(listaRastro[indice], quadro))
                 listaRastro.splice(indice, indice + 1);
 
         //desenhando explosões
         for (indice = 0 ; indice < listaExplosoes.length ; indice++) {
-            try{
+            try {
                 Ctx.drawImage(listaExplosoes[indice].img, listaExplosoes[indice].posX - 73, listaExplosoes[indice].posY - 82, 146, 163);
+                quadro.push(new ComponenteVisual(listaExplosoes[indice].posX, listaExplosoes[indice].posY, 73, 82, 0, 1, listaExplosoes[indice].img));
                 listaExplosoes[indice].atualizarAnimacao();
-                if(listaExplosoes[indice].posX + 73 >= larguraTela)
+                if (listaExplosoes[indice].posX + 73 >= larguraTela) {
                     Ctx.drawImage(listaExplosoes[indice].img, listaExplosoes[indice].posX - 73 - larguraTela, listaExplosoes[indice].posY - 82, 146, 163);
-                else if (listaExplosoes[indice].posX - 73 <= 0)
+                    quadro.push(new ComponenteVisual(listaExplosoes[indice].posX - larguraTela, listaExplosoes[indice].posY, 73, 82, 0, 1, listaExplosoes[indice].img));
+                }
+                else if (listaExplosoes[indice].posX - 73 <= 0) {
                     Ctx.drawImage(listaExplosoes[indice].img, listaExplosoes[indice].posX - 73 + larguraTela, listaExplosoes[indice].posY - 82, 146, 163);
-            } catch (err) {}
+                    quadro.push(new ComponenteVisual(listaExplosoes[indice].posX + larguraTela, listaExplosoes[indice].posY, 73, 82, 0, 1, listaExplosoes[indice].img));
+                }
+            } catch (err) { }
         }
 
         //desenhando barras de integridade
         for (indice = 0; indice < nave.length; indice++)
-            desenharBarras(nave[indice], nave[indice].corIntBar, nave[indice].corExtBar, nave[indice].dimX);
+            desenharBarras(nave[indice]);
 
-    }
+        repeticaoGrafica.push(quadro);
 }
 
-function telaFim(mensagemFinal, color) {
-    for (indice = 0; indice < 3000; indice++) {
-        Ctx.beginPath();
-        Ctx.rect(0, 0, larguraTela, alturaTela);
-        Ctx.globalAlpha = 0.01;
-        Ctx.fillStyle = "#000";
-        Ctx.fill();
-        Ctx.stroke();
-    }
-        Ctx.font = "60px Arial";
-        fim = true;
-        Ctx.fillStyle = color;
-        Ctx.textAlign = "center";
-        Ctx.globalAlpha = 1;
-        Ctx.fillText(mensagemFinal, larguraTela/2, alturaTela / 2);
-}
 
 function AuxiliarColisao(objeto, aviso) {
     this.posX = objeto.posX;
@@ -512,7 +530,7 @@ function calcularColisao(objetoA, objetoB, margem) {
              objetoA.posY - objetoA.dimY * margem > objetoB.posY + objetoB.dimY * margem);
 }
 
-function calcularColisaoNaveProjetil(nave, projetil, margem) {
+function calcularColisaoNaveProjetil(nave, projetil, margem, instanteSom) {
     if (calcularColisao(projetil, nave, margem)) {
         //nave.colisao(projetil.potencia)
         nave.colisao(projetil.potencia, projetil.velY, projetil.sent);
@@ -520,38 +538,42 @@ function calcularColisaoNaveProjetil(nave, projetil, margem) {
             projetil.colidiu = true;
             listaExplosoes.push(new Explosao((nave.posX + projetil.posX) / 2,
                                              (nave.posY + projetil.posY) / 2));
-            somImpacto = new sound("Effects/explosao1.ogg").tocarSom();
+            somImpacto = new Audio("Effects/explosao1.ogg");
+            instanteSom.push(somImpacto);
+            somImpacto.tocarSom();
         }
     }
 }
 
-function calcularColisaoNaveListaProjetil(nave, listaProjetil, margem) {
+function calcularColisaoNaveListaProjetil(nave, listaProjetil, margem, instanteSom) {
     //naveA = nave que recebe o projétil
     //naveB = nave que dispara o projétil
     for (i = 0 ; i < listaProjetil.length ; i++) {
-        calcularColisaoNaveProjetil(nave, listaProjetil[i], margem);
+        calcularColisaoNaveProjetil(nave, listaProjetil[i], margem, instanteSom);
         if (listaProjetil[i].posX + listaProjetil[i].dimX >= larguraTela) {
             auxColisao = new AuxiliarColisao(listaProjetil[i],"nave")
             auxColisao.ajustarBordaEsquerda();
             auxColisao.atualizarPotencia();
-            calcularColisaoNaveProjetil(nave, auxColisao, margem);
+            calcularColisaoNaveProjetil(nave, auxColisao, margem, instanteSom);
         }
         if (listaProjetil[i].posX - listaProjetil[i].dimX <= 0) {
             auxColisao = new AuxiliarColisao(listaProjetil[i],"nave");
             auxColisao.ajustarBordaDireita();
             auxColisao.atualizarPotencia();
-            calcularColisaoNaveProjetil(nave, auxColisao, margem);
+            calcularColisaoNaveProjetil(nave, auxColisao, margem, instanteSom);
         }
     }
 }
 
 
 
-function calcularColisaoProjetil(projetilA, projetilB, margem) {
+function calcularColisaoProjetil(projetilA, projetilB, margem, instanteSom) {
     if (calcularColisao(projetilA, projetilB, margem)) {
         listaExplosoes.push(new Explosao((projetilA.posX + projetilB.posX) / 2,
                                          (projetilA.posY + projetilB.posY) / 2));
-        somImpacto = new sound("Effects/explosao2.ogg").tocarSom();
+        somImpacto = new Audio("Effects/explosao2.ogg");
+        instanteSom.push(somImpacto);
+        somImpacto.tocarSom();
         let potenciaAuxB = projetilB.potencia;
         let potenciaAuxA = projetilA.potencia;
         projetilA.colisao(potenciaAuxB);
@@ -559,54 +581,54 @@ function calcularColisaoProjetil(projetilA, projetilB, margem) {
     }
 }
 
-function calcularColisaoListasProjetil(listaProjetilA, listaProjetilB, margem) {
+function calcularColisaoListasProjetil(listaProjetilA, listaProjetilB, margem, instanteSom) {
     for (i = 0 ; i < listaProjetilB.length ; i++) {
         for (j = 0 ; j < listaProjetilA.length ; j++) {
-            calcularColisaoProjetil(listaProjetilA[j], listaProjetilB[i], margem);
+            calcularColisaoProjetil(listaProjetilA[j], listaProjetilB[i], margem, instanteSom);
             switch (true) {
                 case (listaProjetilA[j].posX + listaProjetilA[j].dimX >= larguraTela):
                     auxColisao = new AuxiliarColisao(listaProjetilA[j],"projetil")
                     auxColisao.ajustarBordaEsquerda();
                     auxColisao.atualizarPotencia();
-                    calcularColisaoProjetil(auxColisao, listaProjetilB[i], margem);
+                    calcularColisaoProjetil(auxColisao, listaProjetilB[i], margem, instanteSom);
                     break;
                 case (listaProjetilA[j].posX - listaProjetilA[j].dimX <= 0):
                     auxColisao = new AuxiliarColisao(listaProjetilA[j],"projetil");
                     auxColisao.ajustarBordaDireita();
                     auxColisao.atualizarPotencia();
-                    calcularColisaoProjetil(auxColisao, listaProjetilB[i], margem);
+                    calcularColisaoProjetil(auxColisao, listaProjetilB[i], margem, instanteSom);
                     break;
                 case (listaProjetilB[i].posX + listaProjetilB[i].dimX >= larguraTela):
                     auxColisao = new AuxiliarColisao(listaProjetilB[i], "projetil");
                     auxColisao.ajustarBordaEsquerda();
                     auxColisao.atualizarPotencia();
-                    calcularColisaoProjetil(listaProjetilA[j], auxColisao, margem);
+                    calcularColisaoProjetil(listaProjetilA[j], auxColisao, margem, instanteSom);
                     break;
                 case (listaProjetilB[i].posX - listaProjetilB[i].dimX <= 0):
                     auxColisao = new AuxiliarColisao(listaProjetilB[i], "projetil");
                     auxColisao.ajustarBordaDireita();
                     auxColisao.atualizarPotencia();
-                    calcularColisaoProjetil(listaProjetilA[j], auxColisao, margem);
+                    calcularColisaoProjetil(listaProjetilA[j], auxColisao, margem, instanteSom);
            } 
         }
     }
 }
 
-function executarColisoes() {
+function executarColisoes(instanteSom) {
     let margem = 0.75;
     let qtNaves = nave.length;
     for (indA = 0; indA < qtNaves ; indA++) {
         for (indB = 1 + indA; indB < qtNaves ; indB++) {
             if (nave[indA].time != nave[indB].time) {
-                calcularColisaoNaveListaProjetil(nave[indA], nave[indB].listaProjetil, margem);
-                calcularColisaoNaveListaProjetil(nave[indB], nave[indA].listaProjetil, margem);
-                calcularColisaoListasProjetil(nave[indA].listaProjetil, nave[indB].listaProjetil, margem);
+                calcularColisaoNaveListaProjetil(nave[indA], nave[indB].listaProjetil, margem, instanteSom);
+                calcularColisaoNaveListaProjetil(nave[indB], nave[indA].listaProjetil, margem, instanteSom);
+                calcularColisaoListasProjetil(nave[indA].listaProjetil, nave[indB].listaProjetil, margem, instanteSom);
             }
         }
     }
 }
 
-function entradasNave(nave) {
+function entradasNave(nave, instanteSom) {
     let modificadorAceleracao = 0,
         modificadorDirecao = null,
         modificadorInvestida = 0;
@@ -644,7 +666,9 @@ function entradasNave(nave) {
     }
     if (nave.pad.padDisp) {
         if (nave.atrDisp == 0) {
-            somImpacto = new sound("Effects/disparo.ogg").tocarSom();
+            somDisparo = new Audio("Effects/disparo.ogg");
+            instanteSom.push(somDisparo);
+            somDisparo.tocarSom();
             nave.atrDisp = nave.atrDispT;
             nave.velY += ((nave.posY > alturaTela / 2) ? 1 : -1)*2;
             nave.listaProjetil.push(new Projetil(nave.posX, nave.posY, nave.dimProjX, nave.dimProjY, nave.vel / 2, 10, nave.potDisparo, ((nave.posY > alturaTela / 2) ? -1 : 1), nave.direc));
@@ -681,41 +705,99 @@ function calculandoExcedenciaNave(nave) {
 }
 
 function atualizarMundo() {
-    if (!fim) {
-        if (nave[0].integ <= 0) {
-            if (nave[1].integ <= 0) {
-                telaFim("DRAW","green");
-            }
-            else {
-                telaFim("BLACK SPACECRAFT WIN","blue");
-
-            }
-        } else if (nave[1].integ <= 0) {
-            telaFim("RED SPACECRAFT WIN","red");
-        }
-        
-        //atualizar naves e disparos
-        for (indice = 0; indice < nave.length; indice++) {
-            entradasNave(nave[indice]);
-            nave[indice].atualizarPosicao();
-            calculandoExcedenciaNave(nave[indice]);
-            atualizarDisparos(nave[indice].listaProjetil);
-            calculandoExcedenciaProjetil(nave[indice]);
-        }
-
-        //limpando explosões
-        for (indice = 0 ; indice < listaExplosoes.length ; indice++)
-            if (listaExplosoes[indice].destruir)
-                listaExplosoes.splice(indice, indice + 1);
-
-        executarColisoes();
+    let instanteSom = [];
+    //atualizar naves e disparos
+    for (indice = 0; indice < nave.length; indice++) {
+        entradasNave(nave[indice], instanteSom);
+        nave[indice].atualizarPosicao();
+        calculandoExcedenciaNave(nave[indice]);
+        atualizarDisparos(nave[indice].listaProjetil);
+        calculandoExcedenciaProjetil(nave[indice]);
     }
+
+    //limpando explosões
+    for (indice = 0 ; indice < listaExplosoes.length ; indice++)
+        if (listaExplosoes[indice].destruir)
+            listaExplosoes.splice(indice, indice + 1);
+
+    executarColisoes(instanteSom);
+    repeticaoSonora.push(instanteSom);
 }
 
+
+
+
+
+function reproduzirRepeticaoGrafica(mensageFinal, color) {
+    let teste = [];
+    if (repetPonteiro == repeticaoGrafica.length)
+        repetPonteiro = 0;
+    imgFundoTela.desenharFundoTela();
+    for (indice = 0; indice < repeticaoSonora[repetPonteiro].length; indice++)
+        repeticaoSonora[repetPonteiro][indice].tocarSom();
+    for (indice = 0; indice < repeticaoGrafica[repetPonteiro].length; indice++)
+        desenharObjeto(repeticaoGrafica[repetPonteiro][indice].posX, repeticaoGrafica[repetPonteiro][indice].posY, repeticaoGrafica[repetPonteiro][indice].dimX, repeticaoGrafica[repetPonteiro][indice].dimY,
+                       repeticaoGrafica[repetPonteiro][indice].angulo, repeticaoGrafica[repetPonteiro][indice].alpha, repeticaoGrafica[repetPonteiro][indice].img, teste);
+    //escreverTela(mensagemFinal, color);
+    repetPonteiro++;
+}
+
+function telaFim(mensagemFinal, color) {
+    for (indice = 0; indice < 3000; indice++) {
+        Ctx.beginPath();
+        Ctx.rect(0, 0, larguraTela, alturaTela);
+        Ctx.globalAlpha = 0.01;
+        Ctx.fillStyle = "#000";
+        Ctx.fill();
+        Ctx.stroke();
+    }
+    fim = true;
+}
+
+function verificarVitoria() {
+    if (nave[0].integ <= 0) {
+        if (nave[1].integ <= 0) {
+            return true;
+            mensagemFinal = "Empate";
+        }
+        else {
+            return true;
+            mensagemFinal = "Player 2 venceu";
+        }
+    } else if (nave[1].integ <= 0) {
+        return true;
+        mensagemFinal = "Player 1 venceu";
+    }
+    return false;
+}
+
+function escreverTela(mensagemFinal, color) {
+    Ctx.font = "60px Arial";
+    Ctx.fillStyle = color;
+    Ctx.textAlign = "center";
+    Ctx.globalAlpha = 1;
+    Ctx.fillText(mensagemFinal, larguraTela / 2, alturaTela / 2);
+}
+
+let mensagemFinal = null;
 function gameLoop(tempo) {
     tempoJogo = parseInt(tempo);
-    atualizarMundo();
-    desenharMundo();
+
+    if (fim) {
+        reproduzirRepeticaoGrafica();
+    }
+    else {
+        if (flagUltmidosMomentos) {
+            if (tempoJogo > ultimosMomentos + 2000) {
+                fim = true;
+            }
+        }else if (verificarVitoria()) {
+            flagUltmidosMomentos = true;
+            ultimosMomentos = tempoJogo;
+        }
+        atualizarMundo();
+        desenharMundo();
+    }
     requestAnimationFrame(gameLoop, Canvas);
 }
 
