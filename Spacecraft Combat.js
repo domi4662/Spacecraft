@@ -7,11 +7,11 @@ nave = [],
 imgFundoTela,
 listaExplosoes = [],
 fim = false,
-vM1, ac1, dac1, mun1, int1, pf1, vM2, ac2, dac2, mun2, int2, pf2,
+vM = [], ac = [], dac = [], mun = [], int = [], pf = [],
 listaRastro = [],
 somImpacto,
-volMusica = 0.8,
-volSom = 1.0,
+volMusica = 0.2,
+volSom = 0.3,
 musicaFundo = new Audio("Music/Soundtrack.mp3").tocarMusica(),
 codigoPad = [],
 auxColisao = null,
@@ -61,8 +61,7 @@ function Controle() {
     this.padDisp = false;
     this.padRotEsq = false;
     this.padRotDir = false;
-    this.padInvestEsq = false;
-    this.padInvestDir = false;
+    this.padInvest = false;
 }
 
 function teclaApertada(evento) {
@@ -78,18 +77,13 @@ function teclaApertada(evento) {
             nave[indice].pad.padRotEsq = true;
         if (codigoPad[indice + 1][evento.keyCode] == "girarD")
             nave[indice].pad.padRotDir = true;
-        if (codigoPad[indice + 1][evento.keyCode] == "investidaE")
-            nave[indice].pad.padInvestEsq = true;
-        if (codigoPad[indice + 1][evento.keyCode] == "investidaD")
-            nave[indice].pad.padInvestDir = true;
+        if (codigoPad[indice + 1][evento.keyCode] == "investida")
+            nave[indice].pad.padInvest = true;
     }
-    if (codigoPad[0][evento.keyCode] == "resetar")
+    if (codigoPad[0][evento.keyCode] == "resetar") {
         iniciarMundo();
+    }
     if (codigoPad[0][evento.keyCode] == "testar") {
-        for (indice = 0; indice < nave.length; indice++) {
-            console.log(indice);
-            console.log(nave[indice]);
-        }
     }
 }
 
@@ -106,25 +100,25 @@ function teclaLiberada(evento) {
             nave[indice].pad.padRotEsq = false;
         if (codigoPad[indice + 1][evento.keyCode] == "girarD")
             nave[indice].pad.padRotDir = false;
-        if (codigoPad[indice + 1][evento.keyCode] == "investidaE")
+        if (codigoPad[indice + 1][evento.keyCode] == "investida")
             nave[indice].pad.padInvestEsq = false;
-        if (codigoPad[indice + 1][evento.keyCode] == "investidaD")
-            nave[indice].pad.padInvestDir = false;
     }
 }
 
-function Explosao(posicaoX, posicaoY) {
+function Explosao(posicaoX, posicaoY, tipo) {
     this.posX = posicaoX;
     this.posY = posicaoY;
-    this.idImg = "explosion";
+    this.tipo = tipo;
+    this.idImg = "explosion" + tipo + "_" ;
     this.indiceImg = 0;
     this.img = document.getElementById(this.idImg + 0);
+    this.indMax = (tipo == 0) ? 11 : (tipo == 1) ? 5 : 3;
     this.destruir = false;
 
     this.atualizarAnimacao = function () {
         this.img = document.getElementById(this.idImg + this.indiceImg);
         this.indiceImg++;
-        if (this.indiceImg > 11)
+        if (this.indiceImg > this.indMax)
             this.destruir = true;
     }
 }
@@ -251,6 +245,10 @@ function Projetil(posicaoX, posicaoY, dimensaoX, dimensaoY, velocidadeX, velocid
         }
     };
 
+    this.colisaoNave = function () {
+        this.colidiu = true;
+    }
+
     this.colisao = function (dano) {
         this.potencia -= dano;
         if (this.potencia <= 0)
@@ -262,8 +260,9 @@ function iniciarMundo() {
 
     iniciarVariaveis();
     
-    nave.push(new Nave(vM1, ac1, dac1, mun1 , int1, pf1, "baixo", "redSpaceCraft", 64, 64, 35, 40, "blue", "red"));
-    nave.push(new Nave(vM2, ac2, dac2, mun2, int2, pf2, "cima", "blackSpaceCraft", 64, 64, 35, 40, "red", "blue"));
+    let i = 0;
+    nave.push(new Nave(vM[i], ac[i], dac[i], mun[i], int[i], pf[i++], "baixo", "blueSpaceCraft", 64, 64, 35, 40, "blue", "red"));
+    nave.push(new Nave(vM[i], ac[i], dac[i], mun[i], int[i], pf[i++], "cima", "graySpaceCraft", 64, 64, 35, 40, "red", "blue"));
   
     window.addEventListener("keydown", teclaApertada);
     window.addEventListener("keyup", teclaLiberada);
@@ -282,26 +281,21 @@ function iniciarVariaveis() {
     ultimosMomentos = null,
     flagUltmidosMomentos = false;
     fim = false;
-    vM1 = document.getElementById("velM1").innerHTML;
-    ac1 = document.getElementById("acel1").innerHTML;
-    dac1 = document.getElementById("contr1").innerHTML;
-    mun1 = document.getElementById("muni1").innerHTML;
-    int1 = document.getElementById("resist1").innerHTML;
-    pf1 = document.getElementById("podFogo1").innerHTML;
-    vM2 = document.getElementById("velM2").innerHTML;
-    ac2 = document.getElementById("acel2").innerHTML;
-    dac2 = document.getElementById("contr2").innerHTML;
-    mun2 = document.getElementById("muni2").innerHTML;
-    int2 = document.getElementById("resist2").innerHTML;
-    pf2 = document.getElementById("podFogo2").innerHTML;
+    for (indice = 0; indice < 2; indice++) {
+        vM[indice] = document.getElementById("velM" + (indice + 1)).innerHTML;
+        ac[indice] = document.getElementById("acel" + (indice + 1)).innerHTML;
+        dac[indice] = document.getElementById("contr" + (indice + 1)).innerHTML;
+        mun[indice] = document.getElementById("muni" + (indice + 1)).innerHTML;
+        int[indice] = document.getElementById("resist" + (indice + 1)).innerHTML;
+        pf[indice] = document.getElementById("podFogo" + (indice + 1)).innerHTML;
+    }
     codigoPad[1] = {
         100: "esquerda",
         102: "direita",
         104: "tiro",
         103: "girarE",
         105: "girarD",
-        97: "investidaE",
-        99: "investidaD"
+        97: "investida"
     };
     codigoPad[2] = {
         65: "esquerda",
@@ -309,8 +303,7 @@ function iniciarVariaveis() {
         81: "girarE",
         83: "tiro",
         69: "girarD",
-        90: "investidaE",
-        67: "investidaD"
+        90: "investida"
     };
     codigoPad[0] = {
         82: "resetar",
@@ -471,7 +464,7 @@ function desenharMundo() {
         //desenhando rastros
         for (indice = 0 ; indice < listaRastro.length ; indice++)
             if (desenharRastro(listaRastro[indice], quadro))
-                listaRastro.splice(indice, indice + 1);
+                listaRastro.splice(indice, 1);
 
         //desenhando explosões
         for (indice = 0 ; indice < listaExplosoes.length ; indice++) {
@@ -498,17 +491,24 @@ function desenharMundo() {
 }
 
 
-function AuxiliarColisao(objeto, aviso) {
+function AuxiliarColisao(objeto) {
     this.posX = objeto.posX;
     this.posY = objeto.posY;
     this.dimX = objeto.dimX;
     this.dimY = objeto.dimY;
+    this.potencia = objeto.potencia;
+    this.velY = objeto.velY;
+    this.sent = objeto.sent;
+    this.colidiu = objeto.colidiu;
     this.obj = objeto;
-    this.potencia = null;
 
     this.ajustarBordaDireita = function () {
         this.posX += larguraTela;
     };
+
+    this.colisaoNave = function () {
+        this.obj.colidiu = true;
+    }
 
     this.ajustarBordaEsquerda = function () {
         this.posX -= larguraTela;
@@ -518,9 +518,6 @@ function AuxiliarColisao(objeto, aviso) {
         this.potencia = this.obj.potencia;
     };
 
-    this.colisao = function (potencia) {
-        this.obj.colisao(potencia);
-    };
 }
 
 function calcularColisao(objetoA, objetoB, margem) {
@@ -530,14 +527,13 @@ function calcularColisao(objetoA, objetoB, margem) {
              objetoA.posY - objetoA.dimY * margem > objetoB.posY + objetoB.dimY * margem);
 }
 
-function calcularColisaoNaveProjetil(nave, projetil, margem, instanteSom) {
-    if (calcularColisao(projetil, nave, margem)) {
-        //nave.colisao(projetil.potencia)
-        nave.colisao(projetil.potencia, projetil.velY, projetil.sent);
+function calcularColisaoNaveProjetil(naveL, projetil, margem, instanteSom) {
+    if (calcularColisao(projetil, naveL, margem)) {
+        naveL.colisao(projetil.potencia, projetil.velY, projetil.sent);
         if (!projetil.colidiu) {
-            projetil.colidiu = true;
-            listaExplosoes.push(new Explosao((nave.posX + projetil.posX) / 2,
-                                             (nave.posY + projetil.posY) / 2));
+            projetil.colisaoNave();
+            listaExplosoes.push(new Explosao((naveL.posX + projetil.posX) / 2,
+                                             (naveL.posY + projetil.posY) / 2, 0));
             somImpacto = new Audio("Effects/explosao1.ogg");
             instanteSom.push(somImpacto);
             somImpacto.tocarSom();
@@ -545,22 +541,22 @@ function calcularColisaoNaveProjetil(nave, projetil, margem, instanteSom) {
     }
 }
 
-function calcularColisaoNaveListaProjetil(nave, listaProjetil, margem, instanteSom) {
+function calcularColisaoNaveListaProjetil(naveL, listaProjetil, margem, instanteSom) {
     //naveA = nave que recebe o projétil
     //naveB = nave que dispara o projétil
     for (i = 0 ; i < listaProjetil.length ; i++) {
-        calcularColisaoNaveProjetil(nave, listaProjetil[i], margem, instanteSom);
-        if (listaProjetil[i].posX + listaProjetil[i].dimX >= larguraTela) {
-            auxColisao = new AuxiliarColisao(listaProjetil[i],"nave")
+        calcularColisaoNaveProjetil(naveL, listaProjetil[i], margem, instanteSom);
+        if (listaProjetil[i].posX + naveL.dimX >= larguraTela) {
+            auxColisao = new AuxiliarColisao(listaProjetil[i]);
             auxColisao.ajustarBordaEsquerda();
             auxColisao.atualizarPotencia();
-            calcularColisaoNaveProjetil(nave, auxColisao, margem, instanteSom);
+            calcularColisaoNaveProjetil(naveL, auxColisao, margem, instanteSom);
         }
-        if (listaProjetil[i].posX - listaProjetil[i].dimX <= 0) {
-            auxColisao = new AuxiliarColisao(listaProjetil[i],"nave");
+        if (listaProjetil[i].posX - naveL.dimX <= 0) {
+            auxColisao = new AuxiliarColisao(listaProjetil[i]);
             auxColisao.ajustarBordaDireita();
             auxColisao.atualizarPotencia();
-            calcularColisaoNaveProjetil(nave, auxColisao, margem, instanteSom);
+            calcularColisaoNaveProjetil(naveL, auxColisao, margem, instanteSom);
         }
     }
 }
@@ -570,7 +566,7 @@ function calcularColisaoNaveListaProjetil(nave, listaProjetil, margem, instanteS
 function calcularColisaoProjetil(projetilA, projetilB, margem, instanteSom) {
     if (calcularColisao(projetilA, projetilB, margem)) {
         listaExplosoes.push(new Explosao((projetilA.posX + projetilB.posX) / 2,
-                                         (projetilA.posY + projetilB.posY) / 2));
+                                         (projetilA.posY + projetilB.posY) / 2, 0));
         somImpacto = new Audio("Effects/explosao2.ogg");
         instanteSom.push(somImpacto);
         somImpacto.tocarSom();
@@ -587,25 +583,25 @@ function calcularColisaoListasProjetil(listaProjetilA, listaProjetilB, margem, i
             calcularColisaoProjetil(listaProjetilA[j], listaProjetilB[i], margem, instanteSom);
             switch (true) {
                 case (listaProjetilA[j].posX + listaProjetilA[j].dimX >= larguraTela):
-                    auxColisao = new AuxiliarColisao(listaProjetilA[j],"projetil")
+                    auxColisao = new AuxiliarColisao(listaProjetilA[j])
                     auxColisao.ajustarBordaEsquerda();
                     auxColisao.atualizarPotencia();
                     calcularColisaoProjetil(auxColisao, listaProjetilB[i], margem, instanteSom);
                     break;
                 case (listaProjetilA[j].posX - listaProjetilA[j].dimX <= 0):
-                    auxColisao = new AuxiliarColisao(listaProjetilA[j],"projetil");
+                    auxColisao = new AuxiliarColisao(listaProjetilA[j]);
                     auxColisao.ajustarBordaDireita();
                     auxColisao.atualizarPotencia();
                     calcularColisaoProjetil(auxColisao, listaProjetilB[i], margem, instanteSom);
                     break;
                 case (listaProjetilB[i].posX + listaProjetilB[i].dimX >= larguraTela):
-                    auxColisao = new AuxiliarColisao(listaProjetilB[i], "projetil");
+                    auxColisao = new AuxiliarColisao(listaProjetilB[i]);
                     auxColisao.ajustarBordaEsquerda();
                     auxColisao.atualizarPotencia();
                     calcularColisaoProjetil(listaProjetilA[j], auxColisao, margem, instanteSom);
                     break;
                 case (listaProjetilB[i].posX - listaProjetilB[i].dimX <= 0):
-                    auxColisao = new AuxiliarColisao(listaProjetilB[i], "projetil");
+                    auxColisao = new AuxiliarColisao(listaProjetilB[i]);
                     auxColisao.ajustarBordaDireita();
                     auxColisao.atualizarPotencia();
                     calcularColisaoProjetil(listaProjetilA[j], auxColisao, margem, instanteSom);
@@ -670,8 +666,12 @@ function entradasNave(nave, instanteSom) {
             instanteSom.push(somDisparo);
             somDisparo.tocarSom();
             nave.atrDisp = nave.atrDispT;
-            nave.velY += ((nave.posY > alturaTela / 2) ? 1 : -1)*2;
-            nave.listaProjetil.push(new Projetil(nave.posX, nave.posY, nave.dimProjX, nave.dimProjY, nave.vel / 2, 10, nave.potDisparo, ((nave.posY > alturaTela / 2) ? -1 : 1), nave.direc));
+            nave.velY += ((nave.posY > alturaTela / 2) ? 1 : -1) * 2;
+            let posicaoY = nave.posY + ((nave.time == "baixo") ? -1 : 1) * (nave.dimY-nave.dimProjY/2) * Math.cos(nave.direc * Math.PI / 180);
+            console.log(nave.direc);
+            let posicaoX = nave.posX + (nave.dimY - nave.dimProjY/2) * Math.sin(nave.direc * Math.PI / 180);
+            nave.listaProjetil.push(new Projetil(posicaoX, posicaoY, nave.dimProjX, nave.dimProjY, nave.vel / 2, 10, nave.potDisparo, ((nave.posY > alturaTela / 2) ? -1 : 1), nave.direc));
+            listaExplosoes.push(new Explosao(posicaoX, posicaoY, 1));
         }
     }
     nave.movimentar(modificadorAceleracao, modificadorDirecao);
@@ -680,7 +680,7 @@ function entradasNave(nave, instanteSom) {
 function atualizarDisparos(listaProjetil){
     for (i = 0 ; i < listaProjetil.length ; i++)
         if (listaProjetil[i].destruir)
-            listaProjetil.splice(i, i + 1);
+            listaProjetil.splice(i, 1);
         else
             listaProjetil[i].atualizarPosicao();
 }
@@ -718,7 +718,7 @@ function atualizarMundo() {
     //limpando explosões
     for (indice = 0 ; indice < listaExplosoes.length ; indice++)
         if (listaExplosoes[indice].destruir)
-            listaExplosoes.splice(indice, indice + 1);
+            listaExplosoes.splice(indice, 1);
 
     executarColisoes(instanteSom);
     repeticaoSonora.push(instanteSom);
